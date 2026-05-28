@@ -257,12 +257,31 @@ static void performSync(GoogleDrive &drive, Manifest &manifest, const SyncEntry 
         // Both exist
         if (!inManifest)
         {
-            // First encounter — 3DS is authoritative, upload
-            printf("  -> First sync, uploading %s\n", relPath.c_str());
-            std::string md5;
-            std::string fileId = drive.syncUpload(rootFolderId, relPath, localPath, "", md5);
-            if (!fileId.empty())
-                manifest.set(localPath, {localMtime, md5, fileId});
+            // First sync: no history to diff against — treat as a conflict so
+            // neither side is silently overwritten.
+            printf("\n  *** FIRST SYNC (both sides exist): %s\n", localPath.c_str());
+            printf("  Press A to keep the 3DS version (upload)\n");
+            printf("  Press B to keep the Drive version (download)\n\n");
+            bool keepLocal = waitForAorB();
+
+            if (keepLocal)
+            {
+                printf("  -> Keeping 3DS version, uploading\n");
+                std::string md5;
+                std::string fileId = drive.syncUpload(rootFolderId, relPath, localPath, "", md5);
+                if (!fileId.empty())
+                    manifest.set(localPath, {localMtime, md5, fileId});
+            }
+            else
+            {
+                printf("  -> Keeping Drive version, downloading\n");
+                if (drive.downloadFile(*dfi, localPath))
+                {
+                    struct stat st = {};
+                    stat(localPath.c_str(), &st);
+                    manifest.set(localPath, {st.st_mtime, dfi->md5, dfi->id});
+                }
+            }
             continue;
         }
 
