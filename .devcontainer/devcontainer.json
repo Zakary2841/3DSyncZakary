@@ -1,6 +1,8 @@
 {
     "name": "3DSync - 3DS Homebrew",
-    "image": "ghcr.io/vllni/3dsync-devcontainer:latest",
+    "build": {
+        "dockerfile": "../docker/3dsync-devcontainer.Dockerfile"
+    },
     "remoteEnv": {
         "DEVKITPRO": "/opt/devkitpro",
         "DEVKITARM": "/opt/devkitpro/devkitARM",
