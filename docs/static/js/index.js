@@ -100,6 +100,17 @@ $(function () {
         window.location.href = "https://www.dropbox.com/oauth2/authorize?client_id=3x8ipjhtplvcoba&response_type=token&redirect_uri=https://vllni.github.io/3DSync/&state=" + token;
     });
 
+    // Auto-extract folder ID when user pastes a full Google Drive URL
+    $('#gdrive-folder-id').on('input paste', function () {
+        let val = $(this).val().trim();
+        let match = val.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+            $(this).val(match[1]);
+            // Refresh Materialize label position
+            $(this).trigger('change');
+        }
+    });
+
     $('#gdrive-login').on('click', async function (e) {
         e.preventDefault();
         let clientId = $('#gdrive-client-id').val().trim();
