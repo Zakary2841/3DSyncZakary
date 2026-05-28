@@ -15,9 +15,11 @@ GoogleDrive::GoogleDrive(const std::string &clientId, const std::string &clientS
 
 bool GoogleDrive::ensureToken()
 {
-    if (!_token.empty()) return true;
-    if (_refreshToken.empty()) return false;
-    return _refreshAccessToken();
+    // Always refresh when a refresh token is available — direct tokens (legacy
+    // 'token=' INI field) expire after 1 hour and must not be reused blindly.
+    if (!_refreshToken.empty())
+        return _refreshAccessToken();
+    return !_token.empty();
 }
 
 void GoogleDrive::upload(std::map<std::pair<std::string, std::string>, std::vector<std::string>> paths)
@@ -342,10 +344,12 @@ int GoogleDrive::_performWithRetry()
         if (res == 0) return 0;
 
         long status = _curl.getStatusCode();
+        printf("  Drive API error: HTTP %ld\n", status);
+
         if (status == 429 && attempt < 2)
         {
-            printf("Rate limited (429), waiting 10 seconds...\n");
-            svcSleepThread(10000000000LL); // 10 seconds in nanoseconds
+            printf("  Rate limited, waiting 10 seconds...\n");
+            svcSleepThread(10000000000LL);
             continue;
         }
         return res;
@@ -590,8 +594,41 @@ std::string GoogleDrive::syncUpload(const std::string &rootFolderId,
 
     if (res != 0)
     {
-        printf("syncUpload failed for %s\n", localPath.c_str());
-        return "";
+        // If a PATCH failed because the Drive file no longer exists (e.g. the
+        // user deleted it on Drive), fall back to creating a new file.
+        if (!existingId.empty() && _curl.getStatusCode() == 404)
+        {
+            printf("  Drive file %s gone, retrying as new upload\n", existingId.c_str());
+            url = "https://www.googleapis.com/upload/drive/v3/files"
+                  "?uploadType=multipart&fields=id,md5Checksum";
+            // Re-add parents to metadata now that we're creating a new file
+            std::string newMetadata = "{\"name\":\"" + _jsonEscape(fileName) +
+                                      "\",\"parents\":[\"" + _jsonEscape(parentFolderId) + "\"]}";
+            std::string newBody;
+            newBody += "--" + boundary + "\r\n";
+            newBody += "Content-Type: application/json; charset=UTF-8\r\n\r\n";
+            newBody += newMetadata + "\r\n";
+            newBody += "--" + boundary + "\r\n";
+            newBody += "Content-Type: application/octet-stream\r\n\r\n";
+            newBody += fileContents;
+            newBody += "\r\n--" + boundary + "--\r\n";
+
+            struct curl_slist *retryHeaders = NULL;
+            retryHeaders = curl_slist_append(retryHeaders, auth.c_str());
+            retryHeaders = curl_slist_append(retryHeaders, contentType.c_str());
+            retryHeaders = curl_slist_append(retryHeaders, "Expect:");
+            _curl.setURL(url);
+            _curl.setHeaders(retryHeaders);
+            _curl.setPostData(newBody);
+            res = _performWithRetry();
+            curl_slist_free_all(retryHeaders);
+        }
+
+        if (res != 0)
+        {
+            printf("syncUpload failed for %s\n", localPath.c_str());
+            return "";
+        }
     }
 
     std::string response = _curl.getResponse();
