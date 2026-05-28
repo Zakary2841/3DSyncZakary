@@ -51,6 +51,12 @@ void Curl::setPostData(const std::string &data)
     curl_easy_setopt(_curl, CURLOPT_POST, 1L);
 }
 
+void Curl::resetToGet()
+{
+    _postData.clear();
+    curl_easy_setopt(_curl, CURLOPT_HTTPGET, 1L);
+}
+
 int Curl::perform()
 {
     _responseData.clear();

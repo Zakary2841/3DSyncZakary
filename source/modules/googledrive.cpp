@@ -25,6 +25,31 @@ void GoogleDrive::upload(std::map<std::pair<std::string, std::string>, std::vect
 
     for (auto item : paths)
     {
+        // Determine the target Drive folder for this path group.
+        // The name (item.first.second) is used as a subfolder on Drive;
+        // if empty, files land directly in _folderId (or Drive root).
+        std::string groupName = item.first.second;
+        std::string targetFolderId = _folderId.empty() ? "root" : _folderId;
+        if (!groupName.empty())
+        {
+            size_t start = 0;
+            while (start < groupName.size())
+            {
+                size_t end = groupName.find('/', start);
+                if (end == std::string::npos)
+                    end = groupName.size();
+                std::string segment = groupName.substr(start, end - start);
+                if (!segment.empty())
+                {
+                    std::string segId = _findOrCreateFolder(segment, targetFolderId);
+                    if (segId.empty())
+                        break; // keep whatever level we reached
+                    targetFolderId = segId;
+                }
+                start = end + 1;
+            }
+        }
+
         for (auto path : item.second)
         {
             std::string localPath = item.first.first + path;
@@ -42,11 +67,12 @@ void GoogleDrive::upload(std::map<std::pair<std::string, std::string>, std::vect
             {
                 boundary += "x";
             }
-            std::string fileName = _driveFileName(item.first.second + path);
+            // File is placed inside the group folder; use only its own name (flat).
+            std::string fileName = _driveFileName(path);
             std::string metadata = "{\"name\":\"" + _jsonEscape(fileName) + "\"";
-            if (_folderId != "")
+            if (!targetFolderId.empty())
             {
-                metadata += ",\"parents\":[\"" + _jsonEscape(_folderId) + "\"]";
+                metadata += ",\"parents\":[\"" + _jsonEscape(targetFolderId) + "\"]";
             }
             metadata += "}";
 
@@ -76,6 +102,73 @@ void GoogleDrive::upload(std::map<std::pair<std::string, std::string>, std::vect
             printf("\n");
         }
     }
+}
+
+std::string GoogleDrive::_findOrCreateFolder(const std::string &name, const std::string &parentId)
+{
+    std::string cacheKey = parentId + "/" + name;
+    auto it = _folderCache.find(cacheKey);
+    if (it != _folderCache.end())
+        return it->second;
+
+    // Escape single quotes in the name for Drive query language
+    std::string safeName = name;
+    size_t pos = 0;
+    while ((pos = safeName.find('\'', pos)) != std::string::npos)
+    {
+        safeName.replace(pos, 1, "\\'");
+        pos += 2;
+    }
+
+    std::string query = "name='" + safeName + "'"
+                                              " and mimeType='application/vnd.google-apps.folder'"
+                                              " and '" +
+                        parentId + "' in parents"
+                                   " and trashed=false";
+    std::string url = "https://www.googleapis.com/drive/v3/files"
+                      "?fields=files(id)&q=" +
+                      _urlEncode(query);
+
+    std::string auth = "Authorization: Bearer " + _token;
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, auth.c_str());
+    _curl.setURL(url);
+    _curl.setHeaders(headers);
+    _curl.resetToGet();
+    int result = _curl.perform();
+    curl_slist_free_all(headers);
+
+    std::string folderId;
+    if (result == 0)
+        folderId = _extractJsonString(_curl.getResponse(), "id");
+
+    if (folderId.empty())
+    {
+        // Not found (or search failed) — create it
+        printf("Creating Drive folder: %s\n", name.c_str());
+        std::string body = "{\"name\":\"" + _jsonEscape(name) + "\""
+                                                                ",\"mimeType\":\"application/vnd.google-apps.folder\""
+                                                                ",\"parents\":[\"" +
+                           _jsonEscape(parentId) + "\"]}";
+
+        headers = NULL;
+        headers = curl_slist_append(headers, auth.c_str());
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        _curl.setURL("https://www.googleapis.com/drive/v3/files");
+        _curl.setHeaders(headers);
+        _curl.setPostData(body);
+        result = _curl.perform();
+        curl_slist_free_all(headers);
+
+        if (result == 0)
+            folderId = _extractJsonString(_curl.getResponse(), "id");
+    }
+
+    if (folderId.empty())
+        printf("Warning: could not find or create Drive folder '%s', uploading to parent\n", name.c_str());
+
+    _folderCache[cacheKey] = folderId;
+    return folderId;
 }
 
 bool GoogleDrive::_refreshAccessToken()

@@ -27,7 +27,9 @@ private:
     std::string _folderId;
     int _uploadCount;
     Curl _curl;
+    std::map<std::string, std::string> _folderCache;
     bool _refreshAccessToken();
+    std::string _findOrCreateFolder(const std::string &name, const std::string &parentId);
     std::string _extractJsonString(const std::string &json, const std::string &key);
     std::string _urlEncode(const std::string &value);
     std::string _jsonEscape(std::string value);

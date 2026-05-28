@@ -14,6 +14,7 @@ public:
     void setHeaders(curl_slist *headers);
     void setReadData(void *pointer);
     void setPostData(const std::string &data);
+    void resetToGet();
     int perform();
     std::string getResponse() const;
 
