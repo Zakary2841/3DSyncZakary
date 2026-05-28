@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  packages: read
+
+env:
+  BUILD_IMAGE: ghcr.io/vllni/3dsync-devcontainer:latest
+
+jobs:
+  build-and-upload:
+    name: Build and Upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Prepare build image
+        run: docker pull "$BUILD_IMAGE" || docker build -f docker/3dsync-devcontainer.Dockerfile -t "$BUILD_IMAGE" .
+
+      - name: Build
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            "$BUILD_IMAGE" \
+            sh -lc 'git config --global --add safe.directory /workspace && git config --global --add safe.directory /workspace/buildtools && make'
+
+      - name: Upload release assets
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            output/3DSync.zip \
+            "output/3ds-arm/3ds/3DSync/3DSync.3dsx" \
+            output/3ds-arm/3DSync.3ds \
+            output/3ds-arm/3DSync.cia
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
