@@ -103,7 +103,14 @@
                       style. Examples: <strong>/3ds/MyApp</strong>, <strong>/roms/nds</strong></p>
                     <p style="margin:0 0 8px 0"><strong>Name</strong> — destination folder on your cloud storage. Use
                       <strong>/</strong> to create nested folders. Examples: <strong>Saves</strong>,
-                      <strong>roms/nds</strong>, <strong>3DS/Checkpoint</strong></p>
+                      <strong>roms/nds</strong>, <strong>3DS/Checkpoint</strong>
+                    </p>
+                    <p style="margin:0 0 8px 0"><strong>Subdirs</strong> — when checked, all subdirectories are synced
+                      recursively. Files are uploaded flat into the Name folder — subdirectory structure is
+                      <strong>not</strong> preserved on cloud storage (e.g. <strong>/roms/nds/saves/game.sav</strong>
+                      becomes <strong>saves_game.sav</strong> inside the Name folder).
+                      Uncheck to sync only the files directly inside the specified folder, ignoring subdirectories
+                      entirely.</p>
                     <p style="margin:0">If Name is left empty the files are uploaded directly into the root (or the
                       Folder ID you configured).</p>
                   </div>

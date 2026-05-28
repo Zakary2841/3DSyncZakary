@@ -143,8 +143,13 @@ $(function () {
     function getConfigString() {
         let provider = localStorage.getItem('provider');
         let strPaths = '';
+        let strShallowPaths = '';
         paths.forEach(function (path) {
-            strPaths += path[0] + '=' + path[1] + '\n';
+            if (path[2] === false) {
+                strShallowPaths += path[0] + '=' + path[1] + '\n';
+            } else {
+                strPaths += path[0] + '=' + path[1] + '\n';
+            }
         });
         if (provider === 'googledrive') {
             let clientId = localStorage.getItem('gdriveClientId');
@@ -157,10 +162,14 @@ $(function () {
             if (folderId) {
                 config += '\nFolderId=' + folderId;
             }
-            config += '\n[Paths]\n' + strPaths;
+            if (strPaths) config += '\n[Paths]\n' + strPaths;
+            if (strShallowPaths) config += '\n[ShallowPaths]\n' + strShallowPaths;
             return config;
         } else {
-            return '[Dropbox]\nToken=' + localStorage.getItem('dropboxToken') + '\n[Paths]\n' + strPaths;
+            let config = '[Dropbox]\nToken=' + localStorage.getItem('dropboxToken');
+            if (strPaths) config += '\n[Paths]\n' + strPaths;
+            if (strShallowPaths) config += '\n[ShallowPaths]\n' + strShallowPaths;
+            return config;
         }
     }
 
@@ -189,7 +198,8 @@ $(function () {
         let id = Date.now();
         let $input = $('<div class="row">' +
             '<div class="input-field col s3"><input id="' + id + '-n" class="white-text" type="text"><label for="' + id + '-n" class="white-text">Name</label><span class="helper-text" data-error="Invalid name"></span></div>' +
-            '<div class="input-field col s7"><input id="' + id + '" class="white-text path-custom" type="text"><label for="' + id + '" class="white-text">Path</label><span class="helper-text" data-error="Invalid path"></span></div>' +
+            '<div class="input-field col s5"><input id="' + id + '" class="white-text path-custom" type="text"><label for="' + id + '" class="white-text">Path</label><span class="helper-text" data-error="Invalid path"></span></div>' +
+            '<div class="col s2 valign-wrapper" style="padding-top:1.4rem"><label class="white-text"><input type="checkbox" class="filled-in path-recursive" checked><span class="white-text" style="font-size:0.82em;white-space:nowrap">Subdirs</span></label></div>' +
             '<div class="col s2"><a href="#" class="btn-floating waves-effect waves-light red remove-custom-path"><i class="material-icons">remove</i></a></div></div>');
         $input.find('.remove-custom-path').on('click', function (e) {
             e.preventDefault();
@@ -254,7 +264,8 @@ $(function () {
                             $name.addClass('invalid');
                         } else {
                             $name.removeClass('invalid');
-                            paths.push([$name.val(), pathSync]);
+                            let isRecursive = $this.closest('.row').find('.path-recursive').prop('checked');
+                            paths.push([$name.val(), pathSync, isRecursive]);
                         }
                     }
                 }

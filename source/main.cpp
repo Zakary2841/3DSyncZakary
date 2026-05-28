@@ -13,7 +13,7 @@
 #include "modules/dropbox.h"
 #include "modules/googledrive.h"
 
-std::vector<std::string> recurse_dir(std::string basepath, std::string additionalpath = "")
+std::vector<std::string> recurse_dir(std::string basepath, std::string additionalpath = "", bool recursive = true)
 {
     std::vector<std::string> paths;
     DIR *dir;
@@ -23,10 +23,25 @@ std::vector<std::string> recurse_dir(std::string basepath, std::string additiona
     {
         while ((ent = readdir(dir)) != NULL)
         {
-            std::string readpath(path + "/" + ent->d_name);
-            std::vector<std::string> recurse = recurse_dir(basepath, additionalpath + "/" + ent->d_name);
-            paths.insert(paths.end(), recurse.begin(), recurse.end());
+            std::string childAdditional = additionalpath + "/" + ent->d_name;
+            std::string childFull = basepath + childAdditional;
+            DIR *childDir = opendir(childFull.c_str());
+            if (childDir != NULL)
+            {
+                closedir(childDir);
+                if (recursive)
+                {
+                    std::vector<std::string> sub = recurse_dir(basepath, childAdditional, true);
+                    paths.insert(paths.end(), sub.begin(), sub.end());
+                }
+                // non-recursive: skip subdirectories entirely
+            }
+            else
+            {
+                paths.push_back(childAdditional);
+            }
         }
+        closedir(dir);
     }
     else
     {
@@ -35,7 +50,6 @@ std::vector<std::string> recurse_dir(std::string basepath, std::string additiona
         else
             printf("Folder %s not found\n", basepath.c_str());
     }
-    closedir(dir);
     return paths;
 }
 
@@ -97,7 +111,12 @@ std::map<std::pair<std::string, std::string>, std::vector<std::string>> getConfi
         if (value.first.rfind("paths=", 0) == 0)
         {
             std::pair<std::string, std::string> key = std::make_pair(value.second, value.first.substr(6));
-            paths[key] = recurse_dir(value.second);
+            paths[key] = recurse_dir(value.second, "", true);
+        }
+        else if (value.first.rfind("shallowpaths=", 0) == 0)
+        {
+            std::pair<std::string, std::string> key = std::make_pair(value.second, value.first.substr(13));
+            paths[key] = recurse_dir(value.second, "", false);
         }
     }
     return paths;
