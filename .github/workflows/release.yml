@@ -32,6 +32,7 @@ jobs:
             -w /workspace \
             "$BUILD_IMAGE" \
             sh -lc 'git config --global --add safe.directory /workspace && git config --global --add safe.directory /workspace/buildtools && make'
+          sudo chown -R "$USER" output/
 
       - name: Rename release assets
         run: |
