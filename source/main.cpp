@@ -243,7 +243,7 @@ static ConflictChoice waitForConflictKey()
 // waitForMainMenuKey — returns true to start sync, false to exit.
 static bool waitForMainMenuKey()
 {
-    printf("\n    A: Run sync\n");
+    printf("\n      A: Run sync\n");
     printf("  START: Exit\n\n");
     while (aptMainLoop())
     {
