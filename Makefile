@@ -22,10 +22,10 @@ VERSION_MINOR := $(word 2, $(VERSION_PARTS))
 VERSION_MICRO := $(word 3, $(VERSION_PARTS))
 
 DESCRIPTION := Sync your saves
-AUTHOR := michvllni
+AUTHOR := Zakary2841
 
-PRODUCT_CODE := CTR-K-SYNC
-UNIQUE_ID := 0xF5555
+PRODUCT_CODE := CTR-K-SYNCZ
+UNIQUE_ID := 0xF5556
 
 BANNER_AUDIO := meta/audio_3ds.wav
 BANNER_IMAGE := meta/banner_3ds.png
