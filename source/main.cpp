@@ -201,7 +201,7 @@ static ConflictChoice waitForConflictKey()
         if (k & KEY_L)
         {
             printf("  Apply resolution to ALL remaining conflicts:\n");
-            printf("  A: 3DS wins all  B: remote wins all  X: skip all  L: cancel\n\n");
+            printf("  A: 3DS wins all  B: Remote wins all  X: Skip all  L: Cancel\n\n");
             bool inSubmenu = true;
             while (aptMainLoop() && inSubmenu)
             {
@@ -231,7 +231,7 @@ static ConflictChoice waitForConflictKey()
                 gspWaitForVBlank();
             }
             // L pressed again — cancel apply-all, reprint conflict prompt
-            printf("  A: keep 3DS version  B: keep remote version  X: skip  START: cancel  L: apply all\n\n");
+            printf("  A: Keep 3DS version  B: Keep remote version  X: Skip  START: Cancel  L: Apply all\n\n");
         }
         gfxFlushBuffers();
         gfxSwapBuffers();
@@ -489,8 +489,8 @@ static bool performSync(GoogleDrive &drive, Manifest &manifest, const SyncEntry 
         }
 
         // Both changed — conflict
-        printf("\n  *** CONFLICT: %s\n", localPath.c_str());
-        printf("  A: keep 3DS version  B: keep remote version  X: skip  START: cancel  L: apply all\n\n");
+        printf("\n  *** CONFLICT: %s\n\n", localPath.c_str());
+        printf("  A: Keep 3DS version  B: Keep remote version\n  X: Skip  START: Cancel  L: Apply all\n\n");
         ConflictChoice choice = waitForConflictKey();
 
         if (choice == CONFLICT_CANCEL)
@@ -546,7 +546,7 @@ bool componentsInit()
     gfxInitDefault();
 
     consoleInit(GFX_BOTTOM, NULL);
-    printf(CONSOLE_RED "\n3DSyncZakary " VERSION_STRING "modified by Zakary2841.\nForked from michvllni, original by Kyraminol" CONSOLE_RESET);
+    printf(CONSOLE_RED "\n3DSyncZakary " VERSION_STRING "\n Modified by Zakary2841\n  Forked by michvllni \n  Original by Kyraminol" CONSOLE_RESET);
     printf("\n\n\n\n\n\nSync your saves with another 3DS,\na PC or even the cloud.");
     printf("\n\n\n\n\n\n Commit: " CONSOLE_BLUE REVISION_STRING CONSOLE_RESET);
 
@@ -597,6 +597,7 @@ static void runSync(const INIReader &reader)
     g_cancelRequested = false;
     g_applyAllChoice = -1;
 
+	printf("  Sync is starting. Please wait...");
     std::string dropboxToken = reader.Get("Dropbox", "token", "");
     std::string googleDriveToken = reader.Get("GoogleDrive", "token", "");
     std::string googleDriveClientId = reader.Get("GoogleDrive", "clientid", "");
@@ -712,7 +713,7 @@ static void runSync(const INIReader &reader)
     }
 
     if (dropboxToken == "" && !hasGoogleDrive)
-        printf("Can't load Dropbox or Google Drive token from 3DSync.ini\n");
+        printf("Can't load Dropbox or Google Drive token from 3DSyncZakary.ini\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -726,7 +727,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    INIReader reader("/3ds/3DSyncZakary/3DSync.ini");
+    INIReader reader("/3ds/3DSyncZakary/3DSyncZakary.ini");
     if (reader.ParseError() < 0)
         printf("Can't load configuration\n");
 
