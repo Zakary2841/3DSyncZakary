@@ -66,9 +66,9 @@ jobs:
         run: |
           gh release upload "${{ github.ref_name }}" "3DSyncZakary-${{ github.ref_name }}-qr.png" --clobber
           qr_url="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/3DSyncZakary-${{ github.ref_name }}-qr.png"
-          qr_markdown="![QR Code for CIA]($qr_url)"
+          qr_markdown="---\n\n### QR Code for CIA\n\n![QR Code for CIA]($qr_url)"
           body=$(gh release view "${{ github.ref_name }}" --json body -q .body)
-          if echo "$body" | grep -qF "$qr_markdown"; then
+          if echo "$body" | grep -qF "![QR Code for CIA]($qr_url)"; then
             echo "QR code already present in release notes, skipping"
           else
             new_body=$(echo "$body" | awk -v qr="$qr_markdown" '/^\*\*Full Changelog\*\*/ { print qr; print ""; print; next } 1')
