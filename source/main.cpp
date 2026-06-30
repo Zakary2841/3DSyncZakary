@@ -546,7 +546,7 @@ bool componentsInit()
     gfxInitDefault();
 
     consoleInit(GFX_BOTTOM, NULL);
-    printf(CONSOLE_RED "\n 3DSync " VERSION_STRING " modified by michvllni, original by Kyraminol" CONSOLE_RESET);
+    printf(CONSOLE_RED "\n 3DSyncZakary " VERSION_STRING " modified by Zakary2841.Forked from michvllni, original by Kyraminol" CONSOLE_RESET);
     printf("\n\n\n\n\n\n  Sync your saves with another 3DS,\n   a PC or even a cloud.");
     printf("\n\n\n\n\n\n Commit: " CONSOLE_BLUE REVISION_STRING CONSOLE_RESET);
 
@@ -648,7 +648,7 @@ static void runSync(const INIReader &reader)
                 }
             }
 
-            Manifest manifest("/3ds/3DSync/manifest.json");
+            Manifest manifest("/3ds/3DSyncZakary/manifest.json");
             manifest.load();
 
             SyncSummary summary;
@@ -726,7 +726,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    INIReader reader("/3ds/3DSync/3DSync.ini");
+    INIReader reader("/3ds/3DSyncZakary/3DSync.ini");
     if (reader.ParseError() < 0)
         printf("Can't load configuration\n");
 
