@@ -250,6 +250,7 @@ static bool waitForMainMenuKey()
         hidScanInput();
         u32 k = hidKeysDown();
         if (k & KEY_A)
+			printf("  Sync is starting. Please wait...");
             return true;
         if (k & KEY_START)
             return false;
@@ -546,7 +547,7 @@ bool componentsInit()
     gfxInitDefault();
 
     consoleInit(GFX_BOTTOM, NULL);
-    printf(CONSOLE_RED "\n3DSyncZakary " VERSION_STRING "modified by Zakary2841.\nForked from michvllni, original by Kyraminol" CONSOLE_RESET);
+    printf(CONSOLE_RED "\n3DSyncZakary " VERSION_STRING "\nModified by Zakary2841.\nForked from michvllni. \nOriginal by Kyraminol" CONSOLE_RESET);
     printf("\n\n\n\n\n\nSync your saves with another 3DS,\na PC or even the cloud.");
     printf("\n\n\n\n\n\n Commit: " CONSOLE_BLUE REVISION_STRING CONSOLE_RESET);
 
@@ -712,7 +713,7 @@ static void runSync(const INIReader &reader)
     }
 
     if (dropboxToken == "" && !hasGoogleDrive)
-        printf("Can't load Dropbox or Google Drive token from 3DSync.ini\n");
+        printf("Can't load Dropbox or Google Drive token from 3DSyncZakary.ini\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -726,7 +727,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    INIReader reader("/3ds/3DSyncZakary/3DSync.ini");
+    INIReader reader("/3ds/3DSyncZakary/3DSyncZakary.ini");
     if (reader.ParseError() < 0)
         printf("Can't load configuration\n");
 
