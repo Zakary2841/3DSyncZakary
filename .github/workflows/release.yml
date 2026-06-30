@@ -47,10 +47,33 @@ jobs:
 
       - name: Upload release assets
         run: |
-          gh release upload "${{ github.ref_name }}" \
+          gh release upload "${{ github.ref_name }}" --clobber \
             output/3DSyncZakary-${{ github.ref_name }}.zip \
             output/3ds-arm/3ds/3DSyncZakary/3DSyncZakary-${{ github.ref_name }}.3dsx \
             output/3ds-arm/3DSyncZakary-${{ github.ref_name }}.3ds \
             output/3ds-arm/3DSyncZakary-${{ github.ref_name }}.cia
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate QR code for CIA
+        run: |
+          sudo apt-get update
+          sudo apt-get install -q -y qrencode
+          cia_url="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/3DSyncZakary-${{ github.ref_name }}.cia"
+          qrencode -s 10 -o "3DSyncZakary-${{ github.ref_name }}-qr.png" "$cia_url"
+
+      - name: Upload QR code and inject into release notes
+        run: |
+          gh release upload "${{ github.ref_name }}" "3DSyncZakary-${{ github.ref_name }}-qr.png" --clobber
+          qr_url="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/3DSyncZakary-${{ github.ref_name }}-qr.png"
+          qr_markdown="![QR Code for CIA]($qr_url)"
+          body=$(gh release view "${{ github.ref_name }}" --json body -q .body)
+          if echo "$body" | grep -qF "$qr_markdown"; then
+            echo "QR code already present in release notes, skipping"
+          else
+            new_body=$(echo "$body" | awk -v qr="$qr_markdown" '/^\*\*Full Changelog\*\*/ { print qr; print ""; print; next } 1')
+            echo "$new_body" > release_notes.md
+            gh release edit "${{ github.ref_name }}" --notes-file release_notes.md
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
