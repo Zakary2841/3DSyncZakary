@@ -8,14 +8,18 @@ permissions:
   contents: write
   packages: read
 
-env:
-  BUILD_IMAGE: ghcr.io/vllni/3dsync-devcontainer:latest
-
 jobs:
   build-and-upload:
     name: Build and Upload
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+
     steps:
+      - name: Set image name
+        id: image
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=ghcr.io/${owner}/3dsync-devcontainer:latest" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -23,14 +27,14 @@ jobs:
           fetch-depth: 0
 
       - name: Prepare build image
-        run: docker pull "$BUILD_IMAGE" || docker build -f docker/3dsync-devcontainer.Dockerfile -t "$BUILD_IMAGE" .
+        run: docker pull "${{ steps.image.outputs.name }}" || docker build -f docker/3dsync-devcontainer.Dockerfile -t "${{ steps.image.outputs.name }}" .
 
       - name: Build
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/workspace" \
             -w /workspace \
-            "$BUILD_IMAGE" \
+            "${{ steps.image.outputs.name }}" \
             sh -lc 'git config --global --add safe.directory /workspace && git config --global --add safe.directory /workspace/buildtools && make'
           sudo chown -R "$USER" output/
 
