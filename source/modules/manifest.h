@@ -13,7 +13,7 @@ struct ManifestEntry
     std::string driveId;  // Drive file ID (for update/download without a name search)
 };
 
-// Persists sync state to /3ds/3DSync/manifest.json.
+// Persists sync state to /3ds/3DSyncZakary/manifest.json.
 // Keys are the full local filesystem paths (e.g. /3ds/Checkpoint/saves/Game/001.sav).
 class Manifest
 {

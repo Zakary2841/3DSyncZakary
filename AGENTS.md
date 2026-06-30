@@ -52,7 +52,7 @@ The Makefile auto-discovers all `.cpp` files under `source/`. Adding a new `.cpp
 - File downloads use a temp file (`localPath + ".3dstmp"`) + atomic rename. On FAT (3DS SD), `rename()` cannot overwrite an existing file — the existing file is first renamed to `.3dsbak`, then the temp is renamed in, then the backup is removed. Restore the backup on failure.
 - `performSync()` in `main.cpp` returns `bool` — `false` means cancellation was requested or a fatal error occurred, and the sync loop must stop.
 - Conflict resolution in `performSync()` calls `waitForConflictKey()` which returns a `ConflictChoice` enum: `CONFLICT_KEEP_LOCAL` (A), `CONFLICT_KEEP_DRIVE` (B), `CONFLICT_SKIP` (X), `CONFLICT_CANCEL` (START).
-- The manifest (`/3ds/3DSync/manifest.json`) is a hand-parsed JSON file. Use `Manifest::set/get/has/remove` — never write JSON by hand elsewhere.
+- The manifest (`/3ds/3DSyncZakary/manifest.json`) is a hand-parsed JSON file. Use `Manifest::set/get/has/remove` — never write JSON by hand elsewhere.
 - `svcSleepThread(nanoseconds)` is the 3DS sleep call (from `<3ds.h>`). Use it for rate-limit back-offs.
 - `printf` output goes to the 3DS top-screen console. Use `CONSOLE_RED` / `CONSOLE_RESET` (from `<3ds.h>`) for error messages.
 

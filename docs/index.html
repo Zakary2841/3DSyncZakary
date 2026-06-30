@@ -150,7 +150,7 @@
         <ol class="readme-list">
           <li>Open the <a href="configurator.html" class="white-text" style="text-decoration:underline">configurator</a>
             and follow the three steps.</li>
-          <li>Place the downloaded <code>3DSync.ini</code> on the SD card at <code>/3ds/3DSync/3DSync.ini</code>.</li>
+          <li>Place the downloaded <code>3DSyncZakary.ini</code> on the SD card at <code>/3ds/3DSyncZakary/3DSyncZakary.ini</code>.</li>
           <li>Install <code>output/3ds-arm/3DSync.cia</code> <strong>or</strong> run <code>3DSync.3dsx</code> from the
             Homebrew Launcher.</li>
           <li>Launch 3DSync. It will sync all configured paths — press <strong>START</strong> to exit.</li>
@@ -162,7 +162,7 @@
       <!-- Configuration -->
       <div class="card-panel blue darken-2 white-text section-card">
         <h4>Configuration</h4>
-        <p>The INI file lives at <code>/3ds/3DSync/3DSync.ini</code>.</p>
+        <p>The INI file lives at <code>/3ds/3DSyncZakary/3DSyncZakary.ini</code>.</p>
 
         <h5 class="white-text"><i class="fa fa-dropbox" style="margin-right:6px"></i>Dropbox</h5>
         <pre><code>[Dropbox]
@@ -230,7 +230,7 @@ Backup=/3ds/MyGame</code></pre>
           <li><strong>RemoteName</strong> is the Drive folder path (use <code>/</code> for nesting, e.g.
             <code>roms/nds</code>).</li>
           <li><strong>LocalPath</strong> is the absolute path on the SD card.</li>
-          <li>Bidirectional entries use a <strong>manifest</strong> (<code>/3ds/3DSync/manifest.json</code>) to detect
+          <li>Bidirectional entries use a <strong>manifest</strong> (<code>/3ds/3DSyncZakary/manifest.json</code>) to detect
             which side changed.</li>
           <li>Upload-only entries always push the local file to Drive and never download.</li>
         </ul>
@@ -299,7 +299,7 @@ Backup=/3ds/MyGame</code></pre>
 
         <h5 class="white-text" style="margin-top:1.25rem">Manifest file</h5>
         <p style="font-size:0.9em">
-          <code>/3ds/3DSync/manifest.json</code> is stored only on the SD card.
+          <code>/3ds/3DSyncZakary/manifest.json</code> is stored only on the SD card.
           Delete it to force a full re-upload on the next run.
         </p>
         <pre><code>{
@@ -339,7 +339,7 @@ Backup=/3ds/MyGame</code></pre>
             style="text-decoration:underline">devkitPro</a> with 3DS support.</p>
         <pre><code>make</code></pre>
         <p style="margin-top:0.6rem;font-size:0.9em;opacity:0.85">
-          Output: <code>output/3ds-arm/3DSync.cia</code> and <code>output/3ds-arm/3ds/3DSync/3DSync.3dsx</code>.
+          Output: <code>output/3ds-arm/3DSync.cia</code> and <code>output/3ds-arm/3ds/3DSyncZakary/3DSync.3dsx</code>.
         </p>
         <div class="note" style="margin-top:0.75rem">
           Full credit to <a href="https://github.com/Kyraminol" target="_blank" rel="noopener noreferrer"

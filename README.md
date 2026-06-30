@@ -10,7 +10,7 @@ Full credit to [Kyraminol](https://github.com/Kyraminol) for the original projec
 ## Quick Start
 
 1. Open the [configurator](https://zakary2841.github.io/3DSync/configurator.html) and follow the three steps.
-2. Place the downloaded `3DSync.ini` on the SD card at `/3ds/3DSync/3DSync.ini`.
+2. Place the downloaded `3DSyncZakary.ini` on the SD card at `/3ds/3DSyncZakary/3DSyncZakary.ini`.
 3. Install `output/3ds-arm/3DSync.cia` **or** run `3DSync.3dsx` from the Homebrew Launcher.
 4. Launch 3DSync. It will sync all configured paths and press **START** to exit.
 
@@ -18,7 +18,7 @@ Full credit to [Kyraminol](https://github.com/Kyraminol) for the original projec
 
 ## Configuration
 
-The INI file lives at `/3ds/3DSync/3DSync.ini`.
+The INI file lives at `/3ds/3DSyncZakary/3DSyncZakary.ini`.
 
 ### Dropbox
 
@@ -65,7 +65,7 @@ Backup=/3ds/MyGame
 
 - **RemoteName** is the Drive folder path (use `/` for nesting, e.g. `roms/nds`).
 - **LocalPath** is the absolute path on the SD card.
-- Bidirectional entries use a **manifest** (`/3ds/3DSync/manifest.json`) to detect which side changed.
+- Bidirectional entries use a **manifest** (`/3ds/3DSyncZakary/manifest.json`) to detect which side changed.
 - Upload-only entries always push the local file to Drive and never download.
 
 ---
@@ -100,7 +100,7 @@ Upload-only paths still use **flat filenames** (`saves_TitleA_001.sav`) for back
 
 ### Manifest file
 
-`/3ds/3DSync/manifest.json` is a plain JSON file stored only on the SD card:
+`/3ds/3DSyncZakary/manifest.json` is a plain JSON file stored only on the SD card:
 
 ```json
 {
@@ -139,5 +139,5 @@ Requires [devkitPro](https://devkitpro.org/) with 3DS support.
 make
 ```
 
-Output: `output/3ds-arm/3DSync.cia` and `output/3ds-arm/3ds/3DSync/3DSync.3dsx`.
+Output: `output/3ds-arm/3DSync.cia` and `output/3ds-arm/3ds/3DSyncZakary/3DSync.3dsx`.
 

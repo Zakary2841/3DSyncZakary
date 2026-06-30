@@ -226,7 +226,7 @@ $(function () {
     $('#download-config').on('click', function (e) {
         e.preventDefault();
         let blob = new Blob([getConfigString()], { type: "application/octet-stream;charset=utf-8" });
-        const fileStream = streamSaver.createWriteStream('3DSync.ini', {
+        const fileStream = streamSaver.createWriteStream('3DSyncZakary.ini', {
             size: blob.size
         });
         const readableStream = blob.stream();

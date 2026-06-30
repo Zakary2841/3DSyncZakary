@@ -712,7 +712,7 @@ static void runSync(const INIReader &reader)
     }
 
     if (dropboxToken == "" && !hasGoogleDrive)
-        printf("Can't load Dropbox or Google Drive token from 3DSync.ini\n");
+        printf("Can't load Dropbox or Google Drive token from 3DSyncZakary.ini\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -726,7 +726,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    INIReader reader("/3ds/3DSyncZakary/3DSync.ini");
+    INIReader reader("/3ds/3DSyncZakary/3DSyncZakary.ini");
     if (reader.ParseError() < 0)
         printf("Can't load configuration\n");
 
