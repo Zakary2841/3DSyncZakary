@@ -1,6 +1,6 @@
 TARGET := 3DS
 
-NAME := 3DSync
+NAME := 3DSyncZakary
 
 BUILD_DIR := build
 OUTPUT_DIR := output
